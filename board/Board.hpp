@@ -4,16 +4,18 @@
 #include <stdlib.h>
 #include <new>
 #include "BoardEntry.hpp"
+#include "DestroyListener.hpp"
 #include "../ship/Ship.hpp"
 
 class Board {
  private:
   BoardEntry** entries;
+  DestroyListener* listener;
   int rows;
   int cols;
 
  public:
-  Board(int rows, int columns) {
+  Board(int rows, int columns, DestroyListener* listener) : listener(listener) {
     this->rows = rows;
     this->cols = columns;
     entries = new BoardEntry*[rows]; 
@@ -22,7 +24,7 @@ class Board {
     }
   }
 
-  Board(const Board& other) : Board(other.rows, other.cols) {
+  Board(const Board& other) : Board(other.rows, other.cols, other.listener) {
     for (int i = 0; i < rows; i++) {
       for (int j = 0; j < cols; j++) {
         entries[i][j] = other.entries[i][j];
@@ -65,6 +67,30 @@ class Board {
 
   char getShipIdAtPosition(int row, int col) {
     return entries[row][col].getId();
+  }
+
+  bool destroyed(char shipId) {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        BoardEntry entry = entries[i][j];
+        if (entry.getId() == shipId && !entry.isHit()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  void shoot(int row, int col) {
+    BoardEntry& entry = entries[row][col];
+    entry.hit();
+    if (destroyed(entry.getId()) && entry.getId() != '0') {
+      listener->onDestroy(entry.getId());
+    } else if (entry.getId() != '0') {
+      listener->onHit(row, col);
+    } else {
+      listener->onMiss(row, col);
+    }
   }
 };
 

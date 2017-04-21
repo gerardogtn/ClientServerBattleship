@@ -12,7 +12,7 @@ class BoardEntry {
     this->_hit = false;
   }
 
-  explicit BoardEntry(const BoardEntry &entry) {
+  BoardEntry(const BoardEntry &entry) {
     this->id = entry.id;
     this->_hit = entry._hit;
   }

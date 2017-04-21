@@ -7,14 +7,23 @@
 using testing::Eq;
 using testing::Test;
 
+#include "../../board/DestroyListener.hpp"
+class MockDestroyListener : public DestroyListener {
+ public:
+  MOCK_CONST_METHOD1(onDestroy, void(char shipId));
+  MOCK_CONST_METHOD2(onHit, void(int row, int col));
+  MOCK_CONST_METHOD2(onMiss, void(int row, int col));
+};
+
 class ABoard : public Test {
  public:
+  MockDestroyListener mockDestroyListener;
   Board board;
   char shipId = 'A';
   int shipLength = 3;
   Ship ship;
 
-  ABoard() : board(10, 10), ship(shipId, shipLength) {
+  ABoard() : board(10, 10, &mockDestroyListener), ship(shipId, shipLength) {
   
   }
 
@@ -57,4 +66,45 @@ TEST_F(ABoard, AddingShipVerticallyFillsEntries) {
 
 TEST_F(ABoard, AddingShipThatDoesntFitReturnsFalse) {
   ASSERT_THAT(board.addShip(ship, 0, 9, true), Eq(false)); 
+}
+
+
+TEST_F(ABoard, HittingAOneSizedShipDestroysTheShip) {
+  char oneLengthShipId = 'B';
+  Ship oneLengthShip(oneLengthShipId, 1);
+  board.addShip(oneLengthShip, 0, 0, true); 
+
+  EXPECT_CALL(mockDestroyListener, onDestroy(oneLengthShipId));
+
+  board.shoot(0, 0); 
+}
+
+TEST_F(ABoard, HittingALargerThanOneSizedShipDoesntDestroyTheShip) {
+  board.addShip(ship, 0, 0, true); 
+
+  EXPECT_CALL(mockDestroyListener, onDestroy(shipId))
+    .Times(0);
+
+  board.shoot(0, 0); 
+}
+
+TEST_F(ABoard, HittingAnEmptyTileCallsOnMiss) {
+  int row = 1; 
+  int col = 1; 
+
+  EXPECT_CALL(mockDestroyListener, onMiss(row, col));
+
+  board.shoot(row, col);
+}
+
+
+TEST_F(ABoard, HittingAShipCallsOnHit) {
+  int row = 1 ;
+  int col = 1; 
+
+  board.addShip(ship, row, col, true);
+
+  EXPECT_CALL(mockDestroyListener, onHit(row, col));
+
+  board.shoot(row, col);
 }
