@@ -10,7 +10,7 @@ using testing::Test;
 #include "../../board/DestroyListener.hpp"
 class MockDestroyListener : public DestroyListener {
  public:
-  MOCK_CONST_METHOD1(onDestroy, void(char shipId));
+  MOCK_CONST_METHOD5(onDestroy, void(char shipId, int row1, int col1, int row2, int col2));
   MOCK_CONST_METHOD2(onHit, void(int row, int col));
   MOCK_CONST_METHOD2(onMiss, void(int row, int col));
 };
@@ -74,7 +74,7 @@ TEST_F(ABoard, HittingAOneSizedShipDestroysTheShip) {
   Ship oneLengthShip(oneLengthShipId, 1);
   board.addShip(oneLengthShip, 0, 0, true); 
 
-  EXPECT_CALL(mockDestroyListener, onDestroy(oneLengthShipId));
+  EXPECT_CALL(mockDestroyListener, onDestroy(oneLengthShipId, 0, 0, 0, 0));
 
   board.shoot(0, 0); 
 }
@@ -82,10 +82,30 @@ TEST_F(ABoard, HittingAOneSizedShipDestroysTheShip) {
 TEST_F(ABoard, HittingALargerThanOneSizedShipDoesntDestroyTheShip) {
   board.addShip(ship, 0, 0, true); 
 
-  EXPECT_CALL(mockDestroyListener, onDestroy(shipId))
+  EXPECT_CALL(mockDestroyListener, onDestroy(shipId, 0, 0, 0, 0))
     .Times(0);
 
   board.shoot(0, 0); 
+}
+
+TEST_F(ABoard, DestroyingALargeHorizontalShipCallsOnDestroyWithStartAndEndPosition) {
+  board.addShip(ship, 0, 0, true);
+
+  EXPECT_CALL(mockDestroyListener, onDestroy(shipId, 0, 0, 0, 2));
+
+  board.shoot(0, 0);
+  board.shoot(0, 1);
+  board.shoot(0, 2);
+}
+
+TEST_F(ABoard, DestroyingALargeVerticalShipCallsOnDestroyWithStartAndEndPosition) {
+  board.addShip(ship, 0, 0, false);
+
+  EXPECT_CALL(mockDestroyListener, onDestroy(shipId, 0, 0, 2, 0));
+
+  board.shoot(0, 0);
+  board.shoot(1, 0);
+  board.shoot(2, 0);
 }
 
 TEST_F(ABoard, HittingAnEmptyTileCallsOnMiss) {

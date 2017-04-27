@@ -65,6 +65,10 @@ class Board {
     return true;
   }
 
+  void setAtPosition(int row, int col, char shipid) {
+    entries[row][col].setId(shipid);
+  }
+
   char getShipIdAtPosition(int row, int col) {
     return entries[row][col].getId();
   }
@@ -81,11 +85,68 @@ class Board {
     return true;
   }
 
+  bool lost() {
+    for (int i = 0; i < rows; i++) {
+      for (int j = 0; j < cols; j++) {
+        BoardEntry entry = entries[i][j];
+        if (entry.getId() != '0' && !entry.isHit()) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+
+  void getShipsPosition(char shipId, int *x1, int *y1, int *x2, int *y2) {
+    int i;
+    int j;
+    bool exit = false;
+    for (i = 0; i < rows; i++) {
+      for (j = 0; j < cols; j++) {
+        BoardEntry entry = entries[i][j];
+        if (entry.getId() == shipId) {
+          *x1 = i; 
+          *y1 = j;
+          exit = true;
+          break;
+        }
+      }
+      if (exit) {
+        break;
+      }
+    }
+
+    int next = i + 1; 
+    if (next < rows && entries[next][j].getId() == shipId) {
+      while (++next < rows && entries[next][j].getId() == shipId) {
+      
+      }
+      *x2 = next - 1;
+      *y2 = j;
+      return;
+    }
+    next = j + 1; 
+    if (next < cols && entries[i][next].getId() == shipId) {
+      while (++next < cols && entries[i][next].getId() == shipId) {
+
+      }
+      *x2 = i; 
+      *y2 = next -1;
+      return;
+    }
+    *x2 = next - 1; 
+    *y2 = next - 1;
+
+  }
+
   void shoot(int row, int col) {
     BoardEntry& entry = entries[row][col];
     entry.hit();
     if (destroyed(entry.getId()) && entry.getId() != '0') {
-      listener->onDestroy(entry.getId());
+      int x1, y1, x2, y2;
+      getShipsPosition(entry.getId(), &x1, &y1, &x2, &y2);
+      listener->onDestroy(entry.getId(), x1, y1, x2, y2);
     } else if (entry.getId() != '0') {
       listener->onHit(row, col);
     } else {
