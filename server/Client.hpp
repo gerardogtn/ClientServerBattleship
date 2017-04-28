@@ -67,20 +67,29 @@ public:
     if (strncmp(buffer, ACT_HIT, strlen(ACT_HIT)) == 0) {
       sscanf(buffer, ACT_HIT " %d %d", &x, &y); 
       destroyEventListener->onHit(x, y);
+
+      write(socketFileDescriptor, ACT, strlen(ACT));
+      printf("Wrote act to %d\n", socketFileDescriptor);
     } else if (strncmp(buffer, ACT_MISS, strlen(ACT_MISS)) == 0) {
       sscanf(buffer, ACT_MISS " %d %d", &x, &y); 
       destroyEventListener->onMiss(x, y);
+
+      write(socketFileDescriptor, ACT, strlen(ACT));
+      printf("Wrote act to %d\n", socketFileDescriptor);
     } else if (strncmp(buffer, ACT_DESTROY, strlen(ACT_DESTROY)) == 0) {
       int id, x2, y2;
       sscanf(buffer, ACT_DESTROY " %d %d %d %d %d", &id, &x, &y, &x2, &y2); 
       destroyEventListener->onDestroy(id, x, y, x2, y2);
+
+      write(socketFileDescriptor, ACT, strlen(ACT));
+      printf("Wrote act to %d\n", socketFileDescriptor);
     }
   }
 
   void mainLoop() {
     memset(buffer, 0, BUFFER_SIZE - 1);
     read(socketFileDescriptor, buffer, BUFFER_SIZE - 1);
-    while(strncmp(buffer, ACT_WIN, strlen(ACT_WIN)) != 0 && strncmp(buffer, ACT_LOST, strlen(ACT_LOST))) {
+    while(strncmp(buffer, ACT_WIN, strlen(ACT_WIN)) != 0 && strncmp(buffer, ACT_LOST, strlen(ACT_LOST)) != 0) {
       int x, y, id, x2, y2;
       if (strncmp(buffer, ACT_SEND, strlen(ACT_SEND)) == 0) {
         sendShips();
@@ -89,15 +98,25 @@ public:
       } else if (strncmp(buffer, ACT_HIT, strlen(ACT_HIT)) == 0) {
         sscanf(buffer, ACT_HIT " %d %d", &x, &y); 
         myEventListener->onHit(x, y);
+
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        printf("Wrote act to %d\n", socketFileDescriptor);
       } else if (strncmp(buffer, ACT_MISS, strlen(ACT_MISS)) == 0) {
         sscanf(buffer, ACT_MISS " %d %d", &x, &y); 
         myEventListener->onMiss(x, y);
+
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        printf("Wrote act to %d\n", socketFileDescriptor);
       } else if (strncmp(buffer, ACT_DESTROY, strlen(ACT_DESTROY)) == 0) {
+        printf("%s\n", "New destroy");
         int id, x2, y2;
         sscanf(buffer, ACT_DESTROY " %d %d %d %d %d", &id, &x, &y, &x2, &y2); 
         myEventListener->onDestroy(id, x, y, x2, y2);
+
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        printf("Wrote act to %d\n", socketFileDescriptor);
       }
-      memset(buffer, 0, BUFFER_SIZE);
+      memset(buffer, 0, BUFFER_SIZE - 1);
       read(socketFileDescriptor, buffer, BUFFER_SIZE - 1);
     }
   }

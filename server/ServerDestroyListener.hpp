@@ -44,6 +44,11 @@ class ServerDestroyListener : public DestroyListener {
     memset((char *)buffer, 0, BUFFER_SIZE - 1);
     sprintf((char *)buffer, ACT_DESTROY " %d %d %d %d %d", shipId, row1, col1, row2, col2);
     write(enemy, buffer, strlen(buffer));
+
+    read(fd, (char *) buffer, BUFFER_SIZE - 1); 
+    printf("Read act from %d\n", fd);
+    read(enemy, (char *) buffer, BUFFER_SIZE - 1);
+    printf("Read act from %d\n", enemy);
   }
 
   virtual void onMiss(int row, int col) const {
@@ -54,6 +59,11 @@ class ServerDestroyListener : public DestroyListener {
     memset((char *)buffer, 0, BUFFER_SIZE - 1);
     sprintf((char *)buffer, ACT_MISS " %d %d\n", row, col);
     write(enemy, buffer, strlen(buffer));
+
+    read(fd, (char *) buffer, BUFFER_SIZE - 1); 
+    printf("Read act from %d\n", fd);
+    read(enemy, (char *) buffer, BUFFER_SIZE - 1);
+    printf("Read act from %d\n", enemy);
   }
 
   virtual void onHit(int row, int col) const {
@@ -64,6 +74,11 @@ class ServerDestroyListener : public DestroyListener {
     memset((char *)buffer, 0, BUFFER_SIZE - 1);
     sprintf((char *)buffer, ACT_HIT " %d %d\n", row, col);
     write(enemy, buffer, strlen(buffer));
+
+    read(fd, (char *) buffer, BUFFER_SIZE - 1); 
+    printf("Read act from %d\n", fd);
+    read(enemy, (char *) buffer, BUFFER_SIZE - 1);
+    printf("Read act from %d\n", enemy);
   }
 };
 

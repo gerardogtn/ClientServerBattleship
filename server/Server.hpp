@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <sys/resource.h>
+#include <errno.h>
 
 #include <sys/socket.h>
 #include <sys/types.h>
@@ -89,29 +91,40 @@ public:
     if (board1->lost()) {
       write(fd1, ACT_LOST, strlen(ACT_LOST));
       write(fd2, ACT_WIN, strlen(ACT_WIN));
-    } else {
-      write(fd1, ACT_WIN, strlen(ACT_WIN));
+    } else {      
       write(fd2, ACT_LOST, strlen(ACT_LOST));
+      write(fd1, ACT_WIN, strlen(ACT_WIN));
     }
   }
 
-  void mainLoop() {
+  void mainLoop() {    
+    struct rlimit rl = {.rlim_cur = 200, .rlim_max = 300};    
+    setrlimit(RLIMIT_NPROC, &rl);
     while (true) {
       int client1_fd = accept(socketFileDescriptor, NULL, NULL);
       int client2_fd = accept(socketFileDescriptor, NULL, NULL);
 
-      client1Board = getShips(client1_fd, client2_fd, &destroyListener1);
-      client2Board = getShips(client2_fd, client1_fd, &destroyListener2); 
+      int pid = fork();
+      if (pid < 0) {
+        printf("%s. %s\n", "Failed with error", strerror(errno));
+      } else if (pid == 0) {
+        client1Board = getShips(client1_fd, client2_fd, &destroyListener1);
+        client2Board = getShips(client2_fd, client1_fd, &destroyListener2); 
 
-      while(!isGameOver()) {
-        act(client1_fd, client2Board); 
-        if (isGameOver()) {
-          break;
+        while(!isGameOver()) {
+          act(client1_fd, client2Board); 
+          if (isGameOver()) {
+            break;
+          }
+          act(client2_fd, client1Board);
         }
-        act(client2_fd, client1Board);
-      }
-      onGameOver(client1_fd, client1Board, client2_fd, client2Board);
+        onGameOver(client1_fd, client1Board, client2_fd, client2Board);  
+        close(client1_fd);
+        close(client2_fd);
+        return;
+      } else {
 
+      }
     }
   }
 
