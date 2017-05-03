@@ -68,20 +68,22 @@ public:
 
       write(socketFileDescriptor, ACT, strlen(ACT));
       printf("Wrote act to %d\n", socketFileDescriptor);
+
+      if (strncmp(buffer, ACT_DESTROY, strlen(ACT_DESTROY)) == 0) {
+        int id, x2, y2;
+        sscanf(buffer, ACT_DESTROY " %d %d %d %d %d", &id, &x, &y, &x2, &y2); 
+        destroyEventListener->onDestroy(id, x, y, x2, y2);
+
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        printf("Wrote act to %d\n", socketFileDescriptor);
+      }
     } else if (strncmp(buffer, ACT_MISS, strlen(ACT_MISS)) == 0) {
       sscanf(buffer, ACT_MISS " %d %d", &x, &y); 
       destroyEventListener->onMiss(x, y);
 
       write(socketFileDescriptor, ACT, strlen(ACT));
       printf("Wrote act to %d\n", socketFileDescriptor);
-    } else if (strncmp(buffer, ACT_DESTROY, strlen(ACT_DESTROY)) == 0) {
-      int id, x2, y2;
-      sscanf(buffer, ACT_DESTROY " %d %d %d %d %d", &id, &x, &y, &x2, &y2); 
-      destroyEventListener->onDestroy(id, x, y, x2, y2);
-
-      write(socketFileDescriptor, ACT, strlen(ACT));
-      printf("Wrote act to %d\n", socketFileDescriptor);
-    }
+    } 
   }
 
   void mainLoop() {

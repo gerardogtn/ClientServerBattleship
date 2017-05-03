@@ -144,6 +144,7 @@ class Board {
     BoardEntry& entry = entries[row][col];
     entry.hit();
     if (destroyed(entry.getId()) && entry.getId() != '0') {
+      listener->onHit(row, col);
       int x1, y1, x2, y2;
       getShipsPosition(entry.getId(), &x1, &y1, &x2, &y2);
       listener->onDestroy(entry.getId(), x1, y1, x2, y2);
