@@ -32,3 +32,6 @@
 *.out
 *.app
 test/test
+
+# Debug files
+*.out.dSYM
