@@ -33,6 +33,14 @@ class MyConsoleDestroyListener : public DestroyListener {
 
 class ConsoleClientEventListener : public ClientEventListener {
  public:
+  virtual void connected() {
+    std::cout << "Connected! Waiting for opponent...\n";
+  }
+
+  virtual void ready() {
+    std::cout << "Ready to play!\n";
+  }
+
   virtual void shoot(int &row, int &col) {
     std::cout << "Insert the position where you want to shoot in the format (x, y)\n";
 
@@ -62,6 +70,24 @@ class ConsoleClientEventListener : public ClientEventListener {
       ships[3][4] = 'b';
     }
   }
+
+
+  virtual void lost() {
+    std::cout << "You lost! :(\n";
+  }
+
+  virtual void won() {
+    std::cout << "CONGRATULATIONS!! You won!\n";
+  }
+
+  virtual void onAttack() {
+    std::cout << "You start attacking\n";
+  }
+
+  virtual void onDefend() {
+    std::cout << "You start defending\n";
+  }
+
 };
 
 

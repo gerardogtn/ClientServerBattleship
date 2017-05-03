@@ -31,8 +31,6 @@ public:
     DestroyListener *destroyEventListener, DestroyListener *myEventListener) {
     socketFileDescriptor = socket(PF_INET, SOCK_STREAM, 0);
     addressInfoResult = getaddrinfo(hostname, port, hints, &addressInfo);
-
-    // fprintf(stderr, "%s: %s\n", "Error with address", gai_strerror(addressInfoResult));
     socketConnectionResult = connect(socketFileDescriptor, addressInfo->ai_addr, addressInfo->ai_addrlen);
     this->listener = listener;
     this->destroyEventListener = destroyEventListener;
@@ -91,7 +89,20 @@ public:
     read(socketFileDescriptor, buffer, BUFFER_SIZE - 1);
     while(strncmp(buffer, ACT_WIN, strlen(ACT_WIN)) != 0 && strncmp(buffer, ACT_LOST, strlen(ACT_LOST)) != 0) {
       int x, y, id, x2, y2;
-      if (strncmp(buffer, ACT_SEND, strlen(ACT_SEND)) == 0) {
+
+      if (strncmp(buffer, ACT_CONNECTED, strlen(ACT_CONNECTED)) == 0) {
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        listener->connected();
+      } else if (strncmp(buffer, ACT_READY, strlen(ACT_READY)) == 0) {
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        listener->ready();
+      } else if (strncmp(buffer, ACT_ATTACK, strlen(ACT_ATTACK)) == 0) {
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        listener->onAttack();
+      } else if (strncmp(buffer, ACT_DEFEND, strlen(ACT_DEFEND)) == 0) {
+        write(socketFileDescriptor, ACT, strlen(ACT));
+        listener->onDefend();
+      } else if (strncmp(buffer, ACT_SEND, strlen(ACT_SEND)) == 0) {
         sendShips();
       } else if (strncmp(buffer, ACT, strlen(ACT)) == 0) {
         shoot();
@@ -119,14 +130,25 @@ public:
       memset(buffer, 0, BUFFER_SIZE - 1);
       read(socketFileDescriptor, buffer, BUFFER_SIZE - 1);
     }
+
+    if (strncmp(buffer, ACT_WIN, strlen(ACT_WIN)) == 0) {
+      listener->won();
+    } else if (strncmp(buffer, ACT_LOST, strlen(ACT_LOST)) == 0) {
+      listener->lost();
+    }
   }
 
   Client(const Client &other) {
 
   }
 
+  virtual void end() {
+
+  }
+
   virtual ~Client() {
     freeaddrinfo(addressInfo);
+    close(socketFileDescriptor);
   }
 
 };

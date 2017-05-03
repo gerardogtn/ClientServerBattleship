@@ -9,6 +9,10 @@
 #define ACT_SHOOT "shoot"
 #define ACT_LOST "lost"
 #define ACT_WIN "win"
+#define ACT_CONNECTED "connected"
+#define ACT_READY "ready"
+#define ACT_ATTACK "attack"
+#define ACT_DEFEND "defend"
 #define BUFFER_SIZE 1024
 
 #define ROWS 11

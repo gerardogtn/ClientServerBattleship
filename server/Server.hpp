@@ -26,6 +26,12 @@ private:
   int bindResult;
   int listenResult;
 
+  char buffer[BUFFER_SIZE];
+  Board* client1Board = nullptr;
+  Board* client2Board = nullptr;
+  ServerDestroyListener destroyListener1;
+  ServerDestroyListener destroyListener2;
+
 public:
 
   /** Create a new server at the given port with maxConnections given the address settings.
@@ -45,13 +51,6 @@ public:
   bool isValid() {
     return addressInfoResult == 0 && socketFileDescriptor != -1 && bindResult != -1 && listenResult != -1;
   }
-
-  char buffer[BUFFER_SIZE];
-  Board* client1Board = nullptr;
-  Board* client2Board = nullptr;
-  ServerDestroyListener destroyListener1;
-  ServerDestroyListener destroyListener2;
-
 
   Board* getShips(int fd, int enemy, ServerDestroyListener *listener) {
     write(fd, ACT_SEND, strlen(ACT_SEND));
@@ -102,7 +101,19 @@ public:
     setrlimit(RLIMIT_NPROC, &rl);
     while (true) {
       int client1_fd = accept(socketFileDescriptor, NULL, NULL);
+      // ClientConnection first(client1_fd);
+
       int client2_fd = accept(socketFileDescriptor, NULL, NULL);
+      write(client2_fd, ACT_CONNECTED, strlen(ACT_CONNECTED));
+      read(client2_fd, buffer, BUFFER_SIZE - 1);
+
+      write(client1_fd, ACT_READY, strlen(ACT_READY));
+      read(client1_fd, buffer, BUFFER_SIZE - 1);
+
+      write(client2_fd, ACT_READY, strlen(ACT_READY));
+      read(client2_fd, buffer, BUFFER_SIZE - 1);
+
+
 
       int pid = fork();
       if (pid < 0) {
@@ -110,6 +121,11 @@ public:
       } else if (pid == 0) {
         client1Board = getShips(client1_fd, client2_fd, &destroyListener1);
         client2Board = getShips(client2_fd, client1_fd, &destroyListener2); 
+
+        write(client1_fd, ACT_ATTACK, strlen(ACT_ATTACK));
+        read(client1_fd, buffer, BUFFER_SIZE - 1);
+        write(client2_fd, ACT_DEFEND, strlen(ACT_DEFEND));
+        read(client2_fd, buffer, BUFFER_SIZE - 1);
 
         while(!isGameOver()) {
           act(client1_fd, client2Board); 
@@ -121,6 +137,8 @@ public:
         onGameOver(client1_fd, client1Board, client2_fd, client2Board);  
         close(client1_fd);
         close(client2_fd);
+        delete client1Board;
+        delete client2Board;
         return;
       } else {
 
