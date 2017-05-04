@@ -10,6 +10,11 @@ private:
   int filedescriptor;
   char buffer[BUFFER_SIZE];
 
+  void swap(ServerToClientWriter &writer) {
+    std::swap(filedescriptor, other.filedescriptor);
+    std::swap(buffer, other.buffer);
+  }
+
 public:
 
   explicit ServerToClientWriter(int filedescriptor = 0) : filedescriptor(filedescriptor) {
@@ -18,6 +23,11 @@ public:
 
   ServerToClientWriter(const ServerToClientWriter &other) : filedescriptor(other.filedescriptor) {
     
+  }
+
+  ServerToClientWriter& operator= (ServerToClientWriter other) {
+    swap(other);
+    return *this;
   }
 
   virtual ~ServerToClientWriter() {
