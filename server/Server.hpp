@@ -111,8 +111,8 @@ public:
       int client2_fd = accept(socketFileDescriptor, NULL, NULL);
       ClientConnection secondConnection(client2_fd, &secondWriter);
 
-      firstWriter.write(ACT_READY);
-      secondWriter.write(ACT_READY);
+      firstConnection.ready();
+      secondConnection.ready();
 
       int pid = fork();
       if (pid < 0) {

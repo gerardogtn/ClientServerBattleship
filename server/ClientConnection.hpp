@@ -26,7 +26,7 @@ public:
 
   ClientConnection(const ClientConnection& other) : fileDescriptor(other.fileDescriptor), 
       writer(other.writer), board(other.board) {
-        
+
   }
 
   ClientConnection& operator= (ClientConnection other) {
@@ -36,6 +36,10 @@ public:
 
   ~ClientConnection() {
     
+  }
+
+  void ready() {
+    writer->write(ACT_READY);
   }
 
 };
