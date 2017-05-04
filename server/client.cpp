@@ -13,8 +13,13 @@ class ConsoleDestroyListener : public DestroyListener {
   virtual void onMiss(int row, int col) const {
     std::cout << "No hit on" << "(" << row << ", " << col << ")\n";
   }
-  virtual void onHit(int row, int col) const {
+  virtual void onHit(int row, int col, bool destroyed) const {
     std::cout << "Hit on" << "(" << row << ", " << col << ")\n";
+    if (destroyed) {
+      std::cout << destroyed << " And it was destroyed\n";
+    } else {
+      std::cout << destroyed << " And nothing especial happened\n";
+    }
   }
 };
 
@@ -26,8 +31,13 @@ class MyConsoleDestroyListener : public DestroyListener {
   virtual void onMiss(int row, int col) const {
     std::cout << "The other shot " << "(" << row << ", " << col << ") and missed\n";
   }
-  virtual void onHit(int row, int col) const {
+  virtual void onHit(int row, int col, bool destroyed) const {
     std::cout << "The other shot on " << "(" << row << ", " << col << ") and hit your ship\n";
+    if (destroyed) {
+      std::cout << "And it was destroyed\n";
+    } else {
+      std::cout << "And nothing especial happened\n";
+    }
   }
 };
 
@@ -68,7 +78,7 @@ class ConsoleClientEventListener : public ClientEventListener {
     } else {
       ships[3][3] = 'B';
       ships[3][4] = 'B';
-      ships[3][5] = 'B'
+      ships[3][5] = 'B';
     }
   }
 

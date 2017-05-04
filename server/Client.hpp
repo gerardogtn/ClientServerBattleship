@@ -63,8 +63,9 @@ public:
     memset(buffer, 0, BUFFER_SIZE - 1);
     read(socketFileDescriptor, buffer, BUFFER_SIZE - 1); 
     if (strncmp(buffer, ACT_HIT, strlen(ACT_HIT)) == 0) {
-      sscanf(buffer, ACT_HIT " %d %d", &x, &y); 
-      destroyEventListener->onHit(x, y);
+      int destroyed = 0;
+      sscanf(buffer, ACT_HIT " %d %d %d", &x, &y, &destroyed); 
+      destroyEventListener->onHit(x, y, destroyed);
 
       write(socketFileDescriptor, ACT, strlen(ACT));
       printf("Wrote act to %d\n", socketFileDescriptor);
@@ -109,8 +110,9 @@ public:
       } else if (strncmp(buffer, ACT, strlen(ACT)) == 0) {
         shoot();
       } else if (strncmp(buffer, ACT_HIT, strlen(ACT_HIT)) == 0) {
-        sscanf(buffer, ACT_HIT " %d %d", &x, &y); 
-        myEventListener->onHit(x, y);
+        int destroyed = 0;
+        sscanf(buffer, ACT_HIT " %d %d %d", &x, &y, &destroyed); 
+        myEventListener->onHit(x, y, destroyed);
 
         write(socketFileDescriptor, ACT, strlen(ACT));
         printf("Wrote act to %d\n", socketFileDescriptor);

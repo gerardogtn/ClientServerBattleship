@@ -66,13 +66,13 @@ class ServerDestroyListener : public DestroyListener {
     printf("Read act from %d\n", enemy);
   }
 
-  virtual void onHit(int row, int col) const {
+  virtual void onHit(int row, int col, bool hit) const {
     memset((char *)buffer, 0, BUFFER_SIZE - 1);
-    sprintf((char *)buffer, ACT_HIT " %d %d\n", row, col);
+    sprintf((char *)buffer, ACT_HIT " %d %d %d\n", row, col, hit);
     write(fd, buffer, strlen(buffer));
 
     memset((char *)buffer, 0, BUFFER_SIZE - 1);
-    sprintf((char *)buffer, ACT_HIT " %d %d\n", row, col);
+    sprintf((char *)buffer, ACT_HIT " %d %d %d\n", row, col, hit);
     write(enemy, buffer, strlen(buffer));
 
     read(fd, (char *) buffer, BUFFER_SIZE - 1); 
