@@ -38,6 +38,11 @@ public:
     
   }
 
+  // TODO: Handle board internally. 
+  void setBoard(Board *board) {
+    this->board = board;
+  }
+
   void ready() {
     writer->write(ACT_READY);
   }

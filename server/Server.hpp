@@ -121,6 +121,9 @@ public:
         client1Board = getShips(client1_fd, client2_fd, &destroyListener1);
         client2Board = getShips(client2_fd, client1_fd, &destroyListener2); 
 
+        firstConnection.setBoard(client1Board);
+        secondConnection.setBoard(client2Board);
+
         firstWriter.write(ACT_ATTACK);
         secondWriter.write(ACT_DEFEND);
 
