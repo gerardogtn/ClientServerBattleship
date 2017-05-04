@@ -5,11 +5,7 @@
 
 class Writer {
 public:
-  virtual void write(const std::string s) {
-    write(s.c_str());
-  }
-
-  virtual void write(char const* message) = 0;
+  virtual void write(char const* message) const = 0;
 };
 
 #endif 

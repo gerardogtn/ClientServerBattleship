@@ -12,15 +12,23 @@ private:
 
 public:
 
-  ServerToClientWriter(int filedescriptor) : filedescriptor(filedescriptor) {
+  explicit ServerToClientWriter(int filedescriptor = 0) : filedescriptor(filedescriptor) {
 
+  }
+
+  ServerToClientWriter(const ServerToClientWriter &other) : filedescriptor(other.filedescriptor) {
+    
   }
 
   virtual ~ServerToClientWriter() {
 
   }
 
-  virtual void write(char const* message) {
+  void setFileDescriptor(int filedescriptor) {
+    this->filedescriptor = filedescriptor;
+  }
+
+  virtual void write(char const* message) const {
     ::write(filedescriptor, message, strlen(message));
     read(filedescriptor, (char *) buffer, BUFFER_SIZE - 1);
   }

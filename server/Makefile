@@ -1,5 +1,5 @@
-CC=gcc
-CXXFLAGS=-I. -std=c++0x
+CC=g++
+CFLAGS=-I. -std=c++0x -g
 DEPS = Server.hpp Client.hpp constants.h Writer.hpp ServerToClientWriter.hpp
 
 all: server client
@@ -12,3 +12,8 @@ client: client.o
 
 %.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
+
+.PHONY: clean
+
+clean: 
+	rm -f *.o

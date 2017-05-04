@@ -13,6 +13,7 @@
 #include <netdb.h>
 
 #include "ServerDestroyListener.hpp"
+#include "ServerToClientWriter.hpp"
 #include "../board/Board.hpp"
 
 #include "constants.h"
@@ -31,6 +32,9 @@ private:
   Board* client2Board = nullptr;
   ServerDestroyListener destroyListener1;
   ServerDestroyListener destroyListener2;
+
+  ServerToClientWriter firstWriter;
+  ServerToClientWriter secondWriter;
 
 public:
 
@@ -88,11 +92,11 @@ public:
 
   void onGameOver(int fd1, Board* board1, int fd2, Board *board2) {
     if (board1->lost()) {
-      write(fd1, ACT_LOST, strlen(ACT_LOST));
-      write(fd2, ACT_WIN, strlen(ACT_WIN));
+      firstWriter.write(ACT_LOST);
+      secondWriter.write(ACT_WIN);
     } else {      
-      write(fd2, ACT_LOST, strlen(ACT_LOST));
-      write(fd1, ACT_WIN, strlen(ACT_WIN));
+      firstWriter.write(ACT_WIN);
+      secondWriter.write(ACT_LOST);
     }
   }
 
@@ -101,19 +105,15 @@ public:
     setrlimit(RLIMIT_NPROC, &rl);
     while (true) {
       int client1_fd = accept(socketFileDescriptor, NULL, NULL);
-      // ClientConnection first(client1_fd);
+      firstWriter.setFileDescriptor(client1_fd);
+      firstWriter.write(ACT_CONNECTED);
 
       int client2_fd = accept(socketFileDescriptor, NULL, NULL);
-      write(client2_fd, ACT_CONNECTED, strlen(ACT_CONNECTED));
-      read(client2_fd, buffer, BUFFER_SIZE - 1);
+      secondWriter.setFileDescriptor(client2_fd);
+      secondWriter.write(ACT_CONNECTED);
 
-      write(client1_fd, ACT_READY, strlen(ACT_READY));
-      read(client1_fd, buffer, BUFFER_SIZE - 1);
-
-      write(client2_fd, ACT_READY, strlen(ACT_READY));
-      read(client2_fd, buffer, BUFFER_SIZE - 1);
-
-
+      firstWriter.write(ACT_READY);
+      secondWriter.write(ACT_READY);
 
       int pid = fork();
       if (pid < 0) {
@@ -122,10 +122,8 @@ public:
         client1Board = getShips(client1_fd, client2_fd, &destroyListener1);
         client2Board = getShips(client2_fd, client1_fd, &destroyListener2); 
 
-        write(client1_fd, ACT_ATTACK, strlen(ACT_ATTACK));
-        read(client1_fd, buffer, BUFFER_SIZE - 1);
-        write(client2_fd, ACT_DEFEND, strlen(ACT_DEFEND));
-        read(client2_fd, buffer, BUFFER_SIZE - 1);
+        firstWriter.write(ACT_ATTACK);
+        secondWriter.write(ACT_DEFEND);
 
         while(!isGameOver()) {
           act(client1_fd, client2Board); 
