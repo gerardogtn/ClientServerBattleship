@@ -109,8 +109,7 @@ public:
       ClientConnection firstConnection(client1_fd, &firstWriter);
 
       int client2_fd = accept(socketFileDescriptor, NULL, NULL);
-      secondWriter.setFileDescriptor(client2_fd);
-      secondWriter.write(ACT_CONNECTED);
+      ClientConnection secondConnection(client2_fd, &secondWriter);
 
       firstWriter.write(ACT_READY);
       secondWriter.write(ACT_READY);
