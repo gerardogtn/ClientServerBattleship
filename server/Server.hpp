@@ -15,6 +15,7 @@
 #include "ServerDestroyListener.hpp"
 #include "ServerToClientWriter.hpp"
 #include "../board/Board.hpp"
+#include "ClientConnection.hpp"
 
 #include "constants.h"
 
@@ -105,8 +106,7 @@ public:
     setrlimit(RLIMIT_NPROC, &rl);
     while (true) {
       int client1_fd = accept(socketFileDescriptor, NULL, NULL);
-      firstWriter.setFileDescriptor(client1_fd);
-      firstWriter.write(ACT_CONNECTED);
+      ClientConnection firstConnection(client1_fd, &firstWriter);
 
       int client2_fd = accept(socketFileDescriptor, NULL, NULL);
       secondWriter.setFileDescriptor(client2_fd);

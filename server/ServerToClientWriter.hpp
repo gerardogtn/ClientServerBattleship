@@ -4,13 +4,17 @@
 #include <unistd.h>
 #include "Writer.hpp"
 
+/** 
+ * A simple writer class that writes from a filedescriptor and waits for a 
+ * reply from the filedescriptor. 
+ */
 class ServerToClientWriter : public Writer {
 
 private:
   int filedescriptor;
   char buffer[BUFFER_SIZE];
 
-  void swap(ServerToClientWriter &writer) {
+  void swap(ServerToClientWriter &other) {
     std::swap(filedescriptor, other.filedescriptor);
     std::swap(buffer, other.buffer);
   }
