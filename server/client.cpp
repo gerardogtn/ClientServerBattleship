@@ -63,11 +63,12 @@ class ConsoleClientEventListener : public ClientEventListener {
       }
     }
     if (input == 1) {
-      ships[0][0] = 'a';
-      ships[0][1] = 'a';
+      ships[0][0] = 'A';
+      ships[0][1] = 'A';
     } else {
-      ships[3][3] = 'b';
-      ships[3][4] = 'b';
+      ships[3][3] = 'B';
+      ships[3][4] = 'B';
+      ships[3][5] = 'B'
     }
   }
 
