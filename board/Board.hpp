@@ -14,6 +14,13 @@ class Board {
   int rows;
   int cols;
 
+  void swap(Board &other) {
+    std::swap(entries, other.entries);
+    std::swap(listener, other.listener);
+    std::swap(rows, other.rows);
+    std::swap(cols, other.cols);
+  }
+
  public:
   Board(int rows, int columns, DestroyListener* listener) : listener(listener) {
     this->rows = rows;
@@ -30,6 +37,11 @@ class Board {
         entries[i][j] = other.entries[i][j];
       }
     }
+  }
+
+  Board& operator= (Board other) {
+    swap(other);
+    return *this;
   }
 
   virtual ~Board() {
