@@ -70,7 +70,9 @@ public:
       write(socketFileDescriptor, ACT, strlen(ACT));
       printf("Wrote act to %d\n", socketFileDescriptor);
 
-      if (strncmp(buffer, ACT_DESTROY, strlen(ACT_DESTROY)) == 0) {
+      if (destroyed == 1) {
+        memset(buffer, 0, BUFFER_SIZE - 1);
+        read(socketFileDescriptor, buffer, BUFFER_SIZE - 1); 
         int id, x2, y2;
         sscanf(buffer, ACT_DESTROY " %d %d %d %d %d", &id, &x, &y, &x2, &y2); 
         destroyEventListener->onDestroy(id, x, y, x2, y2);

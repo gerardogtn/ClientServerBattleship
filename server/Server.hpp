@@ -96,9 +96,7 @@ public:
     }
   }
 
-  void mainLoop() {    
-    struct rlimit rl = {.rlim_cur = 200, .rlim_max = 300};    
-    setrlimit(RLIMIT_NPROC, &rl);
+  void mainLoop() {              
     while (true) {
       int client1_fd = accept(socketFileDescriptor, NULL, NULL);
       // ClientConnection first(client1_fd);

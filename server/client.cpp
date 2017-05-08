@@ -7,7 +7,7 @@
 
 class ConsoleDestroyListener : public DestroyListener {
  public:
-  virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2) const {
+  virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2)  {
     std::cout << "Destroyed ship " << shipId << " located on (" << row1 << ", " << col1 << ") (" << row2 << ", " << col2 << ")\n";
   }
   virtual void onMiss(int row, int col) const {
@@ -25,7 +25,7 @@ class ConsoleDestroyListener : public DestroyListener {
 
 class MyConsoleDestroyListener : public DestroyListener {
  public:
-  virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2) const {
+  virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2)  {
     std::cout << "Your ship was destroyed " << shipId << " located on (" << row1 << ", " << col1 << ") (" << row2 << ", " << col2 << ")\n";
   }
   virtual void onMiss(int row, int col) const {
