@@ -124,9 +124,9 @@ public:
         firstConnection.setBoard(client1Board);
         secondConnection.setBoard(client2Board);
 
-        firstWriter.write(ACT_ATTACK);
-        secondWriter.write(ACT_DEFEND);
-
+        firstConnection.attack();
+        secondConnection.defend();
+        
         while(!isGameOver()) {
           act(client1_fd, client2Board); 
           if (isGameOver()) {

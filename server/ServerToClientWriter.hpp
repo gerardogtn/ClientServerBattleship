@@ -6,7 +6,7 @@
 
 /** 
  * A simple writer class that writes from a filedescriptor and waits for a 
- * reply from the filedescriptor. 
+ * reply from the filedescriptor, whose content is ignored.
  */
 class ServerToClientWriter : public Writer {
 

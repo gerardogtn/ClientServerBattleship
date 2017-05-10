@@ -2,6 +2,7 @@
 #define SERVER_CLIENTCONNECTION_H_
 
 #include "ServerToClientWriter.hpp"
+#include "constants.h"
 
 class ClientConnection {
 private:
@@ -43,8 +44,25 @@ public:
     this->board = board;
   }
 
+  /** Call this method when the connection is ready to start playing. 
+   *  This typically occurs when there's a rival available to play with.
+   */ 
   void ready() {
     writer->write(ACT_READY);
+  }
+
+  /** Call this method to let the connection know that they will start the
+   * game by attacking.
+   */
+  void attack() {
+    writer->write(ACT_ATTACK);
+  }
+
+  /** Call this method to let the connection know that they will start the
+   *  game by defending.
+   */
+  void defend() {
+    writer->write(ACT_DEFEND);
   }
 
 };
