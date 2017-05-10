@@ -1,3 +1,7 @@
+// Server.hpp
+// Alexis Matuk - A01021143
+// Diego Vazquez - A01168095
+// Gerardo Garcia Teruel - A01018057
 #ifndef BOARD_BOARDENTRY_H_
 #define BOARD_BOARDENTRY_H_
 

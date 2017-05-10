@@ -1,3 +1,8 @@
+// Server.hpp
+// Alexis Matuk - A01021143
+// Diego Vazquez - A01168095
+// Gerardo Garcia Teruel - A01018057
+
 #ifndef SERVER_SERVERDESTROYLISTENER_H_
 #define SERVER_SERVERDESTROYLISTENER_H_
 
