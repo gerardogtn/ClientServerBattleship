@@ -62,38 +62,8 @@ public:
     return addressInfoResult == 0 && socketFileDescriptor != -1 && bindResult != -1 && listenResult != -1;
   }
 
-  Board* getShips(int fd, int enemy, ServerDestroyListener *listener) {
-    write(fd, ACT_SEND, strlen(ACT_SEND));
-    Board *board = new Board(ROWS, COLS, listener);
-    listener->setFd(fd);
-    listener->setEnemyFd(enemy);
-    memset(buffer, 0, BUFFER_SIZE);
-    read(fd, buffer, BUFFER_SIZE - 1);
-    for (int i  = 0; i < ROWS; i++) {
-      for (int j = 0; j < COLS; j++) {
-        board->setAtPosition(i, j, buffer[i * ROWS + j]);
-      }
-    }
-    return board;
-  }
-
   bool isGameOver() {
     return client1Board->lost() || client2Board->lost();
-  }
-
-  void act(int fd, Board *board) {
-    write(fd, ACT, strlen(ACT));
-    memset(buffer, 0, BUFFER_SIZE);
-    read(fd, buffer, BUFFER_SIZE - 1);
-    char* command; 
-    int x;
-    int y;
-    sscanf(buffer, "%s %d %d", command, &x, &y);
-
-    if (strncmp(buffer, ACT_SHOOT, strlen(ACT_SHOOT)) == 0) {
-      printf("Shooting from: %d at position: (%d, %d)\n", fd, x, y);
-      board->shoot(x, y);
-    }
   }
 
   void onGameOver(int fd1, Board* board1, int fd2, Board *board2) {
@@ -106,13 +76,21 @@ public:
     }
   }
 
+  bool clientAction(ClientConnection *client, ClientConnection *enemy) {
+    if (client->hasLost()) {
+      client->lost();
+      enemy->won();
+      return false;
+    } else {
+      client->act();
+      return true;
+    }
+  }
+
   void mainLoop() {              
     while (true) {
-      int client1_fd = accept(socketFileDescriptor, NULL, NULL);
-      ClientConnection firstConnection(client1_fd, &firstWriter);
-
-      int client2_fd = accept(socketFileDescriptor, NULL, NULL);
-      ClientConnection secondConnection(client2_fd, &secondWriter);
+      ClientConnection firstConnection(socketFileDescriptor, &firstWriter, &destroyListener1);
+      ClientConnection secondConnection(socketFileDescriptor, &secondWriter, &destroyListener2);
 
       firstConnection.ready();
       secondConnection.ready();
@@ -121,27 +99,30 @@ public:
       if (pid < 0) {
         printf("%s. %s\n", "Failed with error", strerror(errno));
       } else if (pid == 0) {
-        client1Board = getShips(client1_fd, client2_fd, &destroyListener1);
-        client2Board = getShips(client2_fd, client1_fd, &destroyListener2); 
+        client1Board = firstConnection.getShips(secondConnection.getFileDescriptor());
+        client2Board = secondConnection.getShips(firstConnection.getFileDescriptor()); 
 
-        firstConnection.setBoard(client1Board);
-        secondConnection.setBoard(client2Board);
+        firstConnection.setEnemyBoard(client2Board);
+        secondConnection.setEnemyBoard(client1Board);
 
         firstConnection.attack();
         secondConnection.defend();
         
-        while(!isGameOver()) {
-          act(client1_fd, client2Board); 
-          if (isGameOver()) {
+        while(true) {
+          if (firstConnection.hasLost()) {
+            firstConnection.lost();
+            secondConnection.won();
             break;
           }
-          act(client2_fd, client1Board);
+          firstConnection.act();
+
+          if (secondConnection.hasLost()) {
+            secondConnection.lost();
+            firstConnection.won();
+            break;
+          }
+          secondConnection.act();
         }
-        onGameOver(client1_fd, client1Board, client2_fd, client2Board);  
-        close(client1_fd);
-        close(client2_fd);
-        delete client1Board;
-        delete client2Board;
         return;
       } else {
 
