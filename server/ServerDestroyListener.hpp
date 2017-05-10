@@ -35,7 +35,7 @@ class ServerDestroyListener : public DestroyListener {
 
   }
 
-  virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2) const {
+  virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2) {
     printf("Destroying ship: %c at position (%d, %d) (%d, %d)\n", shipId, row1, col1, row2, col2);
     memset((char *)buffer, 0, BUFFER_SIZE - 1);
     sprintf((char *)buffer, ACT_DESTROY " %d %d %d %d %d", shipId, row1, col1, row2, col2);
