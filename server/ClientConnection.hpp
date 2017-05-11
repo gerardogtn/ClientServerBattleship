@@ -11,15 +11,15 @@
 #include "constants.h"
 
 /** A ClientConnection holds all communication from a Battleship
- * server to a Battleship client. It's an internal class that 
- * you must likely won't use in your projects, it's better to delegate your 
- * behaviour to a Server.hpp. 
+ * server to a Battleship client. It's an internal class that
+ * you must likely won't use in your projects, it's better to delegate your
+ * behaviour to a Server.hpp.
  */
 class ClientConnection {
 private:
   int fileDescriptor = 0;
   char buffer[BUFFER_SIZE];
-  Board* board = nullptr; 
+  Board* board = nullptr;
   Board* enemyBoard = nullptr;
   ServerToClientWriter* writer;
   ServerDestroyListener* destroyListener;
@@ -35,10 +35,10 @@ private:
     std::swap(reader, other.reader);
   }
 
-public: 
+public:
   /** Main constructor, accepts a connection from a socket, sets writer, reader, and destroylistener variables */
   ClientConnection(int socketFileDescriptor, ServerToClientWriter *writer, ServerDestroyListener *destroyListener) :
-      writer(writer), 
+      writer(writer),
       destroyListener(destroyListener) {
     fileDescriptor = accept(socketFileDescriptor, NULL, NULL);
     writer->setFileDescriptor(fileDescriptor);
@@ -47,12 +47,12 @@ public:
   }
 
   /** Copy constructor */
-  ClientConnection(const ClientConnection& other) : 
-      fileDescriptor(other.fileDescriptor), 
-      writer(other.writer), 
-      board(other.board), 
-      enemyBoard(other.enemyBoard), 
-      destroyListener(other.destroyListener), 
+  ClientConnection(const ClientConnection& other) :
+      fileDescriptor(other.fileDescriptor),
+      writer(other.writer),
+      board(other.board),
+      enemyBoard(other.enemyBoard),
+      destroyListener(other.destroyListener),
       reader(other.fileDescriptor) {
 
   }
@@ -83,9 +83,9 @@ public:
     this->enemyBoard = board;
   }
 
-  /** Call this method when the client is ready to start playing. 
+  /** Call this method when the client is ready to start playing.
    *  This typically occurs when there's a rival available to play with.
-   */ 
+   */
    void ready() {
     writer->write(ACT_READY);
   }
@@ -104,18 +104,19 @@ public:
     writer->write(ACT_DEFEND);
   }
 
-  /** Call this method to let the client know that they must perform an 
+  /** Call this method to let the client know that they must perform an
    * action
    */
    void act() {
     writer->write(ACT);
     reader.read(buffer, BUFFER_SIZE);
-    char* command; 
+    char* command;
     int x;
     int y;
     sscanf(buffer, "%s %d %d", command, &x, &y);
 
-    if (strncmp(buffer, ACT_SHOOT, strlen(ACT_SHOOT)) == 0) {
+    printf("The command is: %s\n", command);
+    if (strncmp(command, ACT_SHOOT, strlen(ACT_SHOOT)) == 0) {
       enemyBoard->shoot(x, y);
     }
   }
@@ -139,8 +140,8 @@ public:
     return board;
   }
 
-  /** Return true if a client has lost the game, and thus the connection 
-   * is ready to be terminated. 
+  /** Return true if a client has lost the game, and thus the connection
+   * is ready to be terminated.
    */
   bool hasLost() {
     return board->lost();

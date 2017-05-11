@@ -7,6 +7,7 @@
 #define CLIENTREADER_H_
 
 #include <unistd.h>
+#include <algorithm>
 #include "Reader.hpp"
 
 /** A client reader that reads from a file descriptor and 
@@ -46,8 +47,8 @@ public:
   }
 
   virtual void read(char* message, int length) const {
-    memset(message, 0, length - 1);
-    ::read(fileDescriptor, message, length - 1);
+    memset(message, '\0', length - 1);
+    ::read(fileDescriptor, message, length);
     printf("%s %s\n", "Read: ", message);
 
     write(fileDescriptor, ACK, strlen(ACK));

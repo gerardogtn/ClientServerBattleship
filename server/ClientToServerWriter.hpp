@@ -61,7 +61,7 @@ public:
     printf("%s %s\n", "Wrote: ", message);
     ::write(filedescriptor, message, strlen(message));
 
-    read(filedescriptor, (char *) buffer, BUFFER_SIZE - 1);
+    read(filedescriptor, (char *) buffer, BUFFER_SIZE);
     printf("%s %s\n", "Read: ", buffer);
   }
 

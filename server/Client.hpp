@@ -107,8 +107,10 @@ public:
 
       if (strncmp(buffer, ACT_WIN, strlen(ACT_WIN)) == 0) {
         listener->won();
+        return;
       } else if (strncmp(buffer, ACT_LOST, strlen(ACT_LOST)) == 0) {
         listener->lost();
+        return;
       } else if (strncmp(buffer, ACT_CONNECTED, strlen(ACT_CONNECTED)) == 0) {
         listener->connected();
       } else if (strncmp(buffer, ACT_READY, strlen(ACT_READY)) == 0) {
@@ -168,7 +170,6 @@ private:
     sprintf((char *) buffer, ACT_SHOOT " %d %d", x, y);
     writer.write(buffer);
 
-    writer.write(ACT_SHOOT);
     clientReader.read(buffer, BUFFER_SIZE);
     if (strncmp(buffer, ACT_HIT, strlen(ACT_HIT)) == 0) {
       int destroyed = 0;

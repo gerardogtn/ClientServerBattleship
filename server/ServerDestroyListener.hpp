@@ -66,33 +66,33 @@ class ServerDestroyListener : public DestroyListener {
 
   /** Notifies both clients that a destroy event occurred. */
   virtual void onDestroy(char shipId, int row1, int col1, int row2, int col2) {
-    memset((char *) buffer, 0, BUFFER_SIZE - 1);
+    memset((char *) buffer, '\0', BUFFER_SIZE - 1);
     sprintf((char *) buffer, ACT_DESTROY " %d %d %d %d %d", shipId, row1, col1, row2, col2);
     writer.write(buffer);
 
-    memset((char *) buffer, 0, BUFFER_SIZE - 1);
+    memset((char *) buffer, '\0', BUFFER_SIZE - 1);
     sprintf((char *) buffer, ACT_DESTROY " %d %d %d %d %d", shipId, row1, col1, row2, col2);
     enemyWriter.write(buffer);
   }
 
   /** Notifies both clients that a miss event occurred. */
   virtual void onMiss(int row, int col) const {
-    memset((char *) buffer, 0, BUFFER_SIZE - 1);
+    memset((char *) buffer, '\0', BUFFER_SIZE - 1);
     sprintf((char *) buffer, ACT_MISS " %d %d", row, col);
     writer.write(buffer);
 
-    memset((char *)buffer, 0, BUFFER_SIZE - 1);
+    memset((char *)buffer, '\0', BUFFER_SIZE - 1);
     sprintf((char *)buffer, ACT_MISS " %d %d", row, col);
     enemyWriter.write(buffer);
   }
 
   /** Notifies both clients that a hit event occurred. */
   virtual void onHit(int row, int col, bool hit) const {
-    memset((char *) buffer, 0, BUFFER_SIZE - 1);
+    memset((char *) buffer, '\0', BUFFER_SIZE - 1);
     sprintf((char *) buffer, ACT_HIT " %d %d %d", row, col, hit);
     writer.write(buffer);
 
-    memset((char *) buffer, 0, BUFFER_SIZE - 1);
+    memset((char *) buffer, '\0', BUFFER_SIZE - 1);
     sprintf((char *) buffer, ACT_HIT " %d %d %d", row, col, hit);
     enemyWriter.write(buffer);
   }

@@ -46,11 +46,11 @@ public:
   }
 
   virtual void read(char* message, int length) const {
-    memset(message, 0, length - 1);
-    ::read(fileDescriptor, message, length - 1);
+    memset(message, '\0', length - 1);
+    ::read(fileDescriptor, message, length);
     printf("%s %s\n", "Read: ", message);
 
-    write(fileDescriptor, ACT, strlen(ACT));
+    write(fileDescriptor, ACK, strlen(ACK));
     printf("%s %s\n", "Wrote: ", ACK);
   }
 };
