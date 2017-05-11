@@ -55,36 +55,22 @@ public:
     listenResult = listen(socketFileDescriptor, maxConnections);
   }
 
+  ~Server() {
+    freeaddrinfo(addressInfo);
+    close(socketFileDescriptor);
+    if (client1Board) {
+      delete client1Board;
+    }
+    if (client2Board) {
+      delete client2Board;
+    }
+  }
+
   /** Returns true if the server is ready to be used, false otherwise.
    *
    */
   bool isValid() {
     return addressInfoResult == 0 && socketFileDescriptor != -1 && bindResult != -1 && listenResult != -1;
-  }
-
-  bool isGameOver() {
-    return client1Board->lost() || client2Board->lost();
-  }
-
-  void onGameOver(int fd1, Board* board1, int fd2, Board *board2) {
-    if (board1->lost()) {
-      firstWriter.write(ACT_LOST);
-      secondWriter.write(ACT_WIN);
-    } else {      
-      firstWriter.write(ACT_WIN);
-      secondWriter.write(ACT_LOST);
-    }
-  }
-
-  bool clientAction(ClientConnection *client, ClientConnection *enemy) {
-    if (client->hasLost()) {
-      client->lost();
-      enemy->won();
-      return false;
-    } else {
-      client->act();
-      return true;
-    }
   }
 
   void mainLoop() {              
@@ -109,36 +95,28 @@ public:
         secondConnection.defend();
         
         while(true) {
-          if (firstConnection.hasLost()) {
-            firstConnection.lost();
-            secondConnection.won();
+          if (onClientLoose(firstConnection, secondConnection)) {
             break;
           }
           firstConnection.act();
 
-          if (secondConnection.hasLost()) {
-            secondConnection.lost();
-            firstConnection.won();
+          if (onClientLoose(secondConnection, firstConnection)) {
             break;
           }
           secondConnection.act();
         }
         return;
-      } else {
-
-      }
+      } 
     }
   }
 
-  ~Server() {
-    freeaddrinfo(addressInfo);
-    close(socketFileDescriptor);
-    if (client1Board) {
-      delete client1Board;
+  bool onClientLoose(ClientConnection &client, ClientConnection &enemy) {
+    if (client.hasLost()) {
+      client.lost();
+      enemy.won();
+      return true;
     }
-    if (client2Board) {
-      delete client2Board;
-    }
+    return false;
   }
 
 };
