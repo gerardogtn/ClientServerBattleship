@@ -8,6 +8,7 @@
 
 #include <string>
 
+/** A simple abstract class that provides an interface for writing a message */
 class Writer {
 public:
   virtual void write(char const* message) const = 0;

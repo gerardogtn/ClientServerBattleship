@@ -17,6 +17,10 @@ class ClientReader : public Reader {
 private: 
   int fileDescriptor;
 
+  void swap(ClientReader &other) {
+    std::swap(fileDescriptor, other.fileDescriptor);
+  }
+
 public:
   ClientReader(int fileDescriptor = 0) :
       fileDescriptor(fileDescriptor) {
@@ -26,6 +30,11 @@ public:
   ClientReader(const ClientReader &other) :
       fileDescriptor(other.fileDescriptor) {
     
+  }
+
+  ClientReader& operator=(ClientReader other) {
+    swap(other);
+    return *this;
   }
 
   virtual ~ClientReader() {

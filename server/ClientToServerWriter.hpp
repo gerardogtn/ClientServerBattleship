@@ -26,21 +26,27 @@ private:
 
 public:
 
+  // Main constructor, by default it's set to a filedescriptor of 
+  // STDOUT; you must likely want to set this filedescriptor before
+  // you make calls to write. 
   explicit ClientToServerWriter(int filedescriptor = 0) : 
       filedescriptor(filedescriptor) {
 
   }
 
+  /** Copy constructor */
   ClientToServerWriter(const ClientToServerWriter &other) : 
       filedescriptor(other.filedescriptor) {
     
   }
 
+  /** Copy assignment operator */
   ClientToServerWriter& operator= (ClientToServerWriter other) {
     swap(other);
     return *this;
   }
 
+  /** Destructor */
   virtual ~ClientToServerWriter() {
 
   }
@@ -49,6 +55,8 @@ public:
     this->filedescriptor = filedescriptor;
   }
 
+  // Writes a message to filedescriptor and waits for a response from 
+  // filedescriptor.
   virtual void write(char const* message) const {
     printf("%s %s\n", "Wrote: ", message);
     ::write(filedescriptor, message, strlen(message));

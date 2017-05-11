@@ -7,6 +7,9 @@
 
 #include "constants.h"
 
+/** An abstract class that allows a Client to communicate with an implementation
+ *  or an implementation to communicate to a Client.
+ */
 class ClientEventListener {
 public:
   virtual void connected() = 0;

@@ -10,13 +10,17 @@
 #include "ServerReader.hpp"
 #include "constants.h"
 
+/** A ClientConnection holds all communication from a Battleship
+ * server to a Battleship client. It's an internal class that 
+ * you must likely won't use in your projects, it's better to delegate your 
+ * behaviour to a Server.hpp. 
+ */
 class ClientConnection {
 private:
   int fileDescriptor = 0;
   char buffer[BUFFER_SIZE];
   Board* board = nullptr; 
   Board* enemyBoard = nullptr;
-  // TODO: Switch to Writer
   ServerToClientWriter* writer;
   ServerDestroyListener* destroyListener;
   ServerReader reader;
@@ -32,8 +36,8 @@ private:
   }
 
 public: 
-  // TODO: Don't receive fileDescriptor but rather obtain it using accept.
-  ClientConnection(int socketFileDescriptor, ServerToClientWriter *writer, ServerDestroyListener *destroyListener):
+  /** Main constructor, accepts a connection from a socket, sets writer, reader, and destroylistener variables */
+  ClientConnection(int socketFileDescriptor, ServerToClientWriter *writer, ServerDestroyListener *destroyListener) :
       writer(writer), 
       destroyListener(destroyListener) {
     fileDescriptor = accept(socketFileDescriptor, NULL, NULL);
@@ -42,6 +46,7 @@ public:
     reader.setFileDescriptor(fileDescriptor);
   }
 
+  /** Copy constructor */
   ClientConnection(const ClientConnection& other) : 
       fileDescriptor(other.fileDescriptor), 
       writer(other.writer), 
@@ -52,11 +57,13 @@ public:
 
   }
 
+  /** Copy assignment operator */
   ClientConnection& operator= (ClientConnection other) {
     swap(other);
     return *this;
   }
 
+  /** Destructor */
   ~ClientConnection() {
     if (board) {
       delete board;
@@ -132,6 +139,9 @@ public:
     return board;
   }
 
+  /** Return true if a client has lost the game, and thus the connection 
+   * is ready to be terminated. 
+   */
   bool hasLost() {
     return board->lost();
   }

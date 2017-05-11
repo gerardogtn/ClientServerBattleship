@@ -1,3 +1,6 @@
+# Alexis Matuk - A01021143
+# Diego Vazquez - A01168095
+# Gerardo Garcia Teruel - A01018057
 CC=g++
 CFLAGS=-I. -std=c++0x -g
 DEPS = Server.hpp Client.hpp constants.h Writer.hpp ServerToClientWriter.hpp
