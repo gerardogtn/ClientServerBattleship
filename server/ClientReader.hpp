@@ -6,16 +6,17 @@
 #ifndef CLIENTREADER_H_
 #define CLIENTREADER_H_
 
+#include <algorithm>
 #include <unistd.h>
 #include <algorithm>
 #include "Reader.hpp"
 
-/** A client reader that reads from a file descriptor and 
+/** A client reader that reads from a file descriptor and
  * then sends an ACK to indicate that the message was read.
  */
 class ClientReader : public Reader {
 
-private: 
+private:
   int fileDescriptor;
 
   void swap(ClientReader &other) {
@@ -30,7 +31,7 @@ public:
 
   ClientReader(const ClientReader &other) :
       fileDescriptor(other.fileDescriptor) {
-    
+
   }
 
   ClientReader& operator=(ClientReader other) {
