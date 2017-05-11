@@ -7,6 +7,7 @@
 
 #include "ServerToClientWriter.hpp"
 #include "ServerDestroyListener.hpp"
+#include "ServerReader.hpp"
 #include "constants.h"
 
 class ClientConnection {
@@ -18,6 +19,7 @@ private:
   // TODO: Switch to Writer
   ServerToClientWriter* writer;
   ServerDestroyListener* destroyListener;
+  ServerReader reader;
 
   void swap(ClientConnection &other) {
     std::swap(fileDescriptor, other.fileDescriptor);
@@ -26,6 +28,7 @@ private:
     std::swap(enemyBoard, other.enemyBoard);
     std::swap(writer, other.writer);
     std::swap(destroyListener, other.destroyListener);
+    std::swap(reader, other.reader);
   }
 
 public: 
@@ -36,6 +39,7 @@ public:
     fileDescriptor = accept(socketFileDescriptor, NULL, NULL);
     writer->setFileDescriptor(fileDescriptor);
     writer->write(ACT_CONNECTED);
+    reader.setFileDescriptor(fileDescriptor);
   }
 
   ClientConnection(const ClientConnection& other) : 
@@ -43,7 +47,8 @@ public:
       writer(other.writer), 
       board(other.board), 
       enemyBoard(other.enemyBoard), 
-      destroyListener(other.destroyListener) {
+      destroyListener(other.destroyListener), 
+      reader(other.fileDescriptor) {
 
   }
 
@@ -96,16 +101,14 @@ public:
    * action
    */
    void act() {
-    write(fileDescriptor, ACT, strlen(ACT));
-    memset(buffer, 0, BUFFER_SIZE);
-    read(fileDescriptor, buffer, BUFFER_SIZE - 1);
+    writer->write(ACT);
+    reader.read(buffer, BUFFER_SIZE);
     char* command; 
     int x;
     int y;
     sscanf(buffer, "%s %d %d", command, &x, &y);
 
     if (strncmp(buffer, ACT_SHOOT, strlen(ACT_SHOOT)) == 0) {
-      printf("Shooting from: %d at position: (%d, %d)\n", fileDescriptor, x, y);
       enemyBoard->shoot(x, y);
     }
   }
@@ -114,12 +117,13 @@ public:
    * ships
    */
    Board* getShips(int enemyFileDescriptor) {
-    write(fileDescriptor, ACT_SEND, strlen(ACT_SEND));
+    writer->write(ACT_SEND);
+
     board = new Board(ROWS, COLS, destroyListener);
     destroyListener->setFd(fileDescriptor);
     destroyListener->setEnemyFd(enemyFileDescriptor);
-    memset(buffer, 0, BUFFER_SIZE);
-    read(fileDescriptor, buffer, BUFFER_SIZE - 1);
+
+    reader.read(buffer, BUFFER_SIZE);
     for (int i  = 0; i < ROWS; i++) {
       for (int j = 0; j < COLS; j++) {
         board->setAtPosition(i, j, buffer[i * ROWS + j]);

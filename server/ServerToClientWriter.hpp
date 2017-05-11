@@ -48,8 +48,11 @@ public:
   }
 
   virtual void write(char const* message) const {
+    printf("%s %s\n", "Wrote: ", message);
     ::write(filedescriptor, message, strlen(message));
+
     read(filedescriptor, (char *) buffer, BUFFER_SIZE - 1);
+    printf("%s %s\n", "Read: ", buffer);
   }
 
 };

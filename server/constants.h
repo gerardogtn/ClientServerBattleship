@@ -20,6 +20,8 @@
 #define ACT_DEFEND "defend"
 #define BUFFER_SIZE 1024
 
+#define ACK "ack"
+
 #define ROWS 11
 #define COLS 11
 
