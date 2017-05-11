@@ -107,6 +107,14 @@ int main(int argc, char const *argv[]){
   MyConsoleDestroyListener myConsoleDestroyListener;
   ConsoleClientEventListener clientListener;
 
+  char const * hostname; 
+
+  if (argc > 1) {
+    hostname = argv[1];
+  } else {
+    hostname = "localhost";
+  }
+
   struct addrinfo hints;
   memset(&hints, 0, sizeof(struct addrinfo));
   hints.ai_family = AF_INET;
